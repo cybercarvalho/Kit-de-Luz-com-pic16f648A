@@ -105,9 +105,12 @@ void main() {
         TrataCanal2(c2, novos & 2);
         TrataLuzRe(c2, novos & 2);
 
-        // Durante a re, bloqueia somente a intensidade de frenagem.
-        // Programa 0: apagado; programas 1 a 4: PWM base = 10.
-        // Ao desligar a re, TrataCanal2 volta a controlar o freio.
-        if (EstadoRe == 2) FreioPWM(Programa == 0 ? 0 : 10);
+        // Unico comando de PWM no funcionamento normal:
+        // re ativa -> intensidade base, independentemente do freio.
+        // re apagada + freio ativo -> 100%.
+        if ((EstadoRe != 2) && FreioAtivo)
+            FreioPWM(PWM_ACIONADO);
+        else
+            FreioPWM(Programa == 0 ? 0 : 10);
     }
 }
