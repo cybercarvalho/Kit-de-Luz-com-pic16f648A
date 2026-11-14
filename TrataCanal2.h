@@ -3,6 +3,8 @@
 unsigned char FreioAtivo;
 unsigned char CandidatoFreio;
 unsigned char ContadorFreio;
+// Estado compartilhado com TrataLuzRe.h; declarado antes do primeiro uso.
+unsigned char EstadoRe;
 
 void TrataCanal2_Iniciar() {
     FreioAtivo = 0;
