@@ -1,0 +1,111 @@
+#ifndef TRATACANAL1_H
+#define TRATACANAL1_H
+
+// 3 leituras consecutivas para trocar de estado.
+// 5% para acionar; 3% para liberar (histerese).
+unsigned int TempoSetas;
+unsigned char FaseSetas;
+unsigned char DirecaoSeta;  // 0=nenhuma, 1=esquerda, 2=direita
+unsigned char CandidatoSeta;
+unsigned char ContadorSeta;
+unsigned char TempoStrobo;
+unsigned char PassoStrobo;
+
+// PWM por software dos dois farois: Timer2 a 4 kHz,
+// 16 passos => 250 Hz. Duty 10 (escala 0..255) vira 1/16.
+volatile unsigned char FasePWMFarois;
+volatile unsigned char NivelPWMFarois;
+
+void FaroisPWM_Interrupcao() {
+    FasePWMFarois++;
+    if (FasePWMFarois >= 16) FasePWMFarois = 0;
+    FarolDireito = (FasePWMFarois < NivelPWMFarois);
+    FarolEsquerdo = FarolDireito;
+}
+
+void TrataCanal1_Programa() {
+    if (Programa != 3)
+        NivelPWMFarois = (Programa == 0) ? 0 :
+                         (Programa == 1) ? 1 : 16;
+}
+
+void TrataCanal1_Iniciar(unsigned int agora) {
+    TempoSetas = agora;
+    FasePWMFarois = 0;
+    NivelPWMFarois = 0;
+    FaseSetas = 0;
+    DirecaoSeta = 0;
+    CandidatoSeta = 0;
+    ContadorSeta = 0;
+    PassoStrobo = 0;
+    TempoStrobo = (unsigned char)agora;
+    SetaEsquerda = 0;
+    SetaDireita = 0;
+}
+
+void TrataCanal1(unsigned int pulso, unsigned int agora,
+                 unsigned char novaLeitura) {
+    unsigned char candidato;
+
+    TrataCanal1_Programa();
+
+    // Strobo 1: 10 piscadas de 25 ms ON / 25 ms OFF;
+    // depois 150 ms apagado. Relogio de 8 bits (modulo 256).
+    if (Programa == 3) {
+        if ((unsigned char)((unsigned char)agora - TempoStrobo) >=
+            (PassoStrobo == 20 ? 150 : 25)) {
+            TempoStrobo = (unsigned char)agora;
+            if (++PassoStrobo == 21) PassoStrobo = 0;
+        }
+        NivelPWMFarois = (PassoStrobo < 20 &&
+                          !(PassoStrobo & 1)) ? 16 : 0;
+    } else {
+        PassoStrobo = 0;
+        TempoStrobo = (unsigned char)agora;
+    }
+
+    // Avaliar apenas uma vez por pulso RC recebido, nunca por giro do while.
+    if (novaLeitura && Programa != 4) {
+        candidato = DirecaoSeta;
+
+        if (DirecaoSeta == 1) {
+            if (pulso >= (Media1 - Margem1Soltar)) candidato = 0;
+        } else if (DirecaoSeta == 2) {
+            if (pulso <= (Media1 + Margem1Soltar)) candidato = 0;
+        } else {
+            if (pulso < Min1) candidato = 1;
+            else if (pulso > Max1) candidato = 2;
+            else candidato = 0;
+        }
+
+        if (candidato == DirecaoSeta) {
+            ContadorSeta = 0;
+        } else {
+            if (candidato != CandidatoSeta) {
+                CandidatoSeta = candidato;
+                ContadorSeta = 0;
+            }
+            if (++ContadorSeta == 3) {
+                DirecaoSeta = candidato;
+                ContadorSeta = 0;
+                if (DirecaoSeta) {
+                    FaseSetas = 1;
+                    TempoSetas = agora;
+                }
+            }
+        }
+    }
+
+    if ((unsigned int)(agora - TempoSetas) >= 500) {
+        TempoSetas = agora;
+        FaseSetas = !FaseSetas;
+    }
+    if (Programa == 4) {
+        SetaEsquerda = FaseSetas;
+        SetaDireita = FaseSetas;
+    } else {
+        SetaEsquerda = FaseSetas && (DirecaoSeta == 1);
+        SetaDireita = FaseSetas && (DirecaoSeta == 2);
+    }
+}
+#endif
