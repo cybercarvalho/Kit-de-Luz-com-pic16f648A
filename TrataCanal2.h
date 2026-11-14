@@ -1,41 +1,43 @@
 #ifndef TRATACANAL2_H
 #define TRATACANAL2_H
 unsigned char FreioAtivo;
-unsigned char CandidatoFreio;
+unsigned char FiltroRuidoFReio;
 unsigned char ContadorFreio;
+// Estado compartilhado com TrataLuzRe.h; declarado antes do primeiro uso.
+unsigned char EstadoRe;
 
 void TrataCanal2_Iniciar() {
     FreioAtivo = 0;
-    CandidatoFreio = 0;
+    FiltroRuidoFReio = 0;
     ContadorFreio = 0;
     FreioPWM(0);
 }
 
 void TrataCanal2(unsigned int pulso, unsigned char novaLeitura) {
-    unsigned char candidato;
+    unsigned char EstadoFreio;
     if (novaLeitura) {
-        candidato = FreioAtivo;
+        EstadoFreio = FreioAtivo;
         if (!FreioAtivo) {
             if ((!FreioInvertido && (pulso > Max2)) ||
-                (FreioInvertido && (pulso < Min2))) candidato = 1;
+                (FreioInvertido && (pulso < Min2))) EstadoFreio = 1;
         } else {
             if ((!FreioInvertido && (pulso < Limite2Soltar)) ||
-                (FreioInvertido && (pulso > Limite2SoltarInv))) candidato = 0;
+                (FreioInvertido && (pulso > Limite2SoltarInv))) EstadoFreio = 0;
         }
-        if (candidato == FreioAtivo) {
+        if (EstadoFreio == FreioAtivo) {
             ContadorFreio = 0;
         } else {
-            if (candidato != CandidatoFreio) {
-                CandidatoFreio = candidato;
+            if (EstadoFreio != FiltroRuidoFReio) {
+                FiltroRuidoFReio = EstadoFreio;
                 ContadorFreio = 0;
             }
             if (++ContadorFreio == 3) {
-                FreioAtivo = candidato;
+                FreioAtivo = EstadoFreio;
                 ContadorFreio = 0;
             }
         }
     }
-    if (FreioAtivo) FreioPWM(PWM_ACIONADO);
+    if (FreioAtivo && (EstadoRe == 1)) FreioPWM(PWM_ACIONADO);
     else FreioPWM(Programa == 0 ? 0 : 10);
 }
 #endif

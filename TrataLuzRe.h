@@ -2,7 +2,6 @@
 #define TRATALUZRE_H
 // EstadoRe: 0=aguardando primeiro freio, 1=primeiro freio,
 // 2=re acionada. Segue a logica do KitLuzArduino.
-unsigned char EstadoRe;
 unsigned char FreioAnteriorRe;
 
 void LuzRe_Reiniciar() {
@@ -18,6 +17,7 @@ void TrataLuzRe(unsigned int pulso, unsigned char novaLeitura) {
     acelerando = FreioInvertido ? (pulso > Max2) : (pulso < Min2);
     if (acelerando) {
         EstadoRe = 0;
+        FreioAnteriorRe = 0;
     } else if (FreioAtivo && !FreioAnteriorRe && EstadoRe < 2) {
         EstadoRe++;
     }

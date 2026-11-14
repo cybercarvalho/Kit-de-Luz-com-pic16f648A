@@ -92,7 +92,7 @@ void main() {
         TrataCanal3(c3, c2, agora, novos & 2);
         if (ModoProg || ModoProgAnterior) {
             FreioAtivo = 0;
-            CandidatoFreio = 0;
+            FiltroRuidoFReio = 0;
             ContadorFreio = 0;
             LuzRe_Reiniciar();
         }
@@ -104,5 +104,8 @@ void main() {
         TrataCanal1(c1, agora, novos & 1);
         TrataCanal2(c2, novos & 2);
         TrataLuzRe(c2, novos & 2);
+        // A luz de re define se o PWM de frenagem deve ser pleno.
+        if (EstadoRe != 1 || !FreioAtivo)
+            FreioPWM(Programa == 0 ? 0 : 10);
     }
 }
