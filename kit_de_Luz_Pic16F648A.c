@@ -105,9 +105,9 @@ void main() {
         TrataCanal2(c2, novos & 2);
         TrataLuzRe(c2, novos & 2);
 
-        // A luz de re tem prioridade sobre o freio.
-        // Suprime tanto a frenagem (255) quanto a lanterna base (10).
-        // Quando a re desliga, TrataCanal2 restaura o PWM normal.
-        if (EstadoRe == 2) FreioPWM(PWM_SOLTO);
+        // Durante a re, bloqueia somente a intensidade de frenagem.
+        // Programa 0: apagado; programas 1 a 4: PWM base = 10.
+        // Ao desligar a re, TrataCanal2 volta a controlar o freio.
+        if (EstadoRe == 2) FreioPWM(Programa == 0 ? 0 : 10);
     }
 }
