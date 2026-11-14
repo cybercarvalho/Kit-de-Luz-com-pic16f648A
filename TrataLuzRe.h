@@ -18,6 +18,7 @@ void TrataLuzRe(unsigned int pulso, unsigned char novaLeitura) {
     acelerando = FreioInvertido ? (pulso > Max2) : (pulso < Min2);
     if (acelerando) {
         EstadoRe = 0;
+        FreioAnteriorRe = 0;
     } else if (FreioAtivo && !FreioAnteriorRe && EstadoRe < 2) {
         EstadoRe++;
     }
