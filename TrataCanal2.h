@@ -14,25 +14,25 @@ void TrataCanal2_Iniciar() {
 }
 
 void TrataCanal2(unsigned int pulso, unsigned char novaLeitura) {
-    unsigned char candidato;
+    unsigned char EstadoFreio;
     if (novaLeitura) {
-        candidato = FreioAtivo;
+        EstadoFreio = FreioAtivo;
         if (!FreioAtivo) {
             if ((!FreioInvertido && (pulso > Max2)) ||
-                (FreioInvertido && (pulso < Min2))) candidato = 1;
+                (FreioInvertido && (pulso < Min2))) EstadoFreio = 1;
         } else {
             if ((!FreioInvertido && (pulso < Limite2Soltar)) ||
-                (FreioInvertido && (pulso > Limite2SoltarInv))) candidato = 0;
+                (FreioInvertido && (pulso > Limite2SoltarInv))) EstadoFreio = 0;
         }
-        if (candidato == FreioAtivo) {
+        if (EstadoFreio == FreioAtivo) {
             ContadorFreio = 0;
         } else {
-            if (candidato != FiltroRuidoFReio) {
-                FiltroRuidoFReio = candidato;
+            if (EstadoFreio != FiltroRuidoFReio) {
+                FiltroRuidoFReio = EstadoFreio;
                 ContadorFreio = 0;
             }
             if (++ContadorFreio == 3) {
-                FreioAtivo = candidato;
+                FreioAtivo = EstadoFreio;
                 ContadorFreio = 0;
             }
         }
