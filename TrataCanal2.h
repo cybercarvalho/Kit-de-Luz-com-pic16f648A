@@ -1,14 +1,14 @@
 #ifndef TRATACANAL2_H
 #define TRATACANAL2_H
 unsigned char FreioAtivo;
-unsigned char CandidatoFreio;
+unsigned char FiltroRuidoFReio;
 unsigned char ContadorFreio;
 // Estado compartilhado com TrataLuzRe.h; declarado antes do primeiro uso.
 unsigned char EstadoRe;
 
 void TrataCanal2_Iniciar() {
     FreioAtivo = 0;
-    CandidatoFreio = 0;
+    FiltroRuidoFReio = 0;
     ContadorFreio = 0;
     FreioPWM(0);
 }
@@ -27,8 +27,8 @@ void TrataCanal2(unsigned int pulso, unsigned char novaLeitura) {
         if (candidato == FreioAtivo) {
             ContadorFreio = 0;
         } else {
-            if (candidato != CandidatoFreio) {
-                CandidatoFreio = candidato;
+            if (candidato != FiltroRuidoFReio) {
+                FiltroRuidoFReio = candidato;
                 ContadorFreio = 0;
             }
             if (++ContadorFreio == 3) {
