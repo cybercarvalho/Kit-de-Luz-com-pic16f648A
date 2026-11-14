@@ -3,8 +3,8 @@
 // ModoProg: 0=normal, 1=sequencia inicial, 2=apagado 2s,
 // 3=pisca 100ms, 4=apagado apos confirmar inversao.
 // LuzProg: 0=apagado, 1=setas, 2=farois+freio, 3=todas.
-unsigned char Programa, ModoProg, Ch3Estado, Ch2Armado, Ch2Altos, Ch1Armado, Ch1Altos;
-unsigned char FreioInvertido, SetasInvertidas, LuzProg, PassoLuz;
+unsigned char Programa, ModoProg, Ch3Estado, Ch2Armado, Ch2Altos, Ch1Armado, Ch1Altos, Ch2BaixoArmado, Ch2Baixos;
+unsigned char FreioInvertido, SetasInvertidas, BrakeLight, LuzProg, PassoLuz;
 unsigned int TempoCh3, TempoProg;
 
 void TrataCanal3_Iniciar(unsigned int agora) {
@@ -15,12 +15,15 @@ void TrataCanal3_Iniciar(unsigned int agora) {
         Ch1Armado = 0;
         Ch1Altos = 0;
     Ch2Altos = 0;
+    Ch2BaixoArmado = 0;
+    Ch2Baixos = 0;
     LuzProg = 0;
     PassoLuz = 0;
     TempoCh3 = agora;
     TempoProg = agora;
     FreioInvertido = (LerFreioEEPROM() == 0x5A);
     SetasInvertidas = (LerSetasEEPROM() == 0x5A);
+    BrakeLight = (LerBrakeLightEEPROM() == 0x5A);
 }
 void TrataCanal3_Cancelar(unsigned int agora) {
     ModoProg = 0;
@@ -29,6 +32,8 @@ void TrataCanal3_Cancelar(unsigned int agora) {
         Ch1Armado = 0;
         Ch1Altos = 0;
     Ch2Altos = 0;
+    Ch2BaixoArmado = 0;
+    Ch2Baixos = 0;
     LuzProg = 0;
     PassoLuz = 0;
     TempoCh3 = agora;
@@ -49,6 +54,8 @@ void TrataCanal3(unsigned int c3, unsigned int c2, unsigned int c1,
         Ch1Armado = 0;
         Ch1Altos = 0;
     Ch2Altos = 0;
+    Ch2BaixoArmado = 0;
+    Ch2Baixos = 0;
         LuzProg = 0;
         PassoLuz = 0;
         return;
@@ -71,6 +78,8 @@ void TrataCanal3(unsigned int c3, unsigned int c2, unsigned int c1,
         Ch1Armado = 0;
         Ch1Altos = 0;
             Ch2Altos = 0;
+    Ch2BaixoArmado = 0;
+    Ch2Baixos = 0;
             return;
         }
         // 0-50ms: setas; 50-100ms: farois e freio;
@@ -95,6 +104,8 @@ void TrataCanal3(unsigned int c3, unsigned int c2, unsigned int c1,
         Ch1Armado = 0;
         Ch1Altos = 0;
             Ch2Altos = 0;
+    Ch2BaixoArmado = 0;
+    Ch2Baixos = 0;
         }
         return;
     }
@@ -112,6 +123,8 @@ void TrataCanal3(unsigned int c3, unsigned int c2, unsigned int c1,
         if (c2 <= Max2) {
             Ch2Armado = 1;
             Ch2Altos = 0;
+    Ch2BaixoArmado = 0;
+    Ch2Baixos = 0;
         }
         else if (c2 > Limite2Prog) {
             if (Ch2Armado) {
@@ -121,6 +134,8 @@ void TrataCanal3(unsigned int c3, unsigned int c2, unsigned int c1,
         Ch1Armado = 0;
         Ch1Altos = 0;
                     Ch2Altos = 0;
+    Ch2BaixoArmado = 0;
+    Ch2Baixos = 0;
                     FreioInvertido = !FreioInvertido;
                     SalvarFreioEEPROM(FreioInvertido);
                     ModoProg = 4;
@@ -132,6 +147,30 @@ void TrataCanal3(unsigned int c3, unsigned int c2, unsigned int c1,
         else {
             // Zona intermediaria: nao confirma HIGH.
             Ch2Altos = 0;
+    Ch2BaixoArmado = 0;
+    Ch2Baixos = 0;
+        }
+    }
+    // Canal 2 abaixo de -10%: alterna a funcao Brake Light da RA2.
+    // Armado no neutro; exige tres pulsos RC consecutivos no lado baixo.
+    if (novo2) {
+        if (c2 >= Min2 && c2 <= Max2) {
+            Ch2BaixoArmado = 1;
+            Ch2Baixos = 0;
+        } else if (c2 < Limite2ProgBaixo) {
+            if (Ch2BaixoArmado) {
+                if (++Ch2Baixos >= 3) {
+                    Ch2BaixoArmado = 0;
+                    Ch2Baixos = 0;
+                    BrakeLight = !BrakeLight;
+                    SalvarBrakeLightEEPROM(BrakeLight);
+                    ModoProg = 4;
+                    LuzProg = 0;
+                    return;
+                }
+            }
+        } else {
+            Ch2Baixos = 0;
         }
     }
     // Canal 1: mesmo procedimento do Canal 2, mas para inverter as setas.
