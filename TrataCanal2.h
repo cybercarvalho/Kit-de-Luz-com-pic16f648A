@@ -2,7 +2,7 @@
 #define TRATACANAL2_H
 
 unsigned char FreioAtivo;
-unsigned char CandidatoFreio;
+unsigned char TrataRuidoFreio;
 unsigned char ContadorFreio;
 
 // EstadoRe: 0=sem frenagem, 1=primeira frenagem, 2=re ligada.
@@ -17,34 +17,34 @@ void LuzRe_Reiniciar() {
 
 void TrataCanal2_Iniciar() {
     FreioAtivo = 0;
-    CandidatoFreio = 0;
+    TrataRuidoFreio = 0;
     ContadorFreio = 0;
     LuzRe_Reiniciar();
     FreioPWM(0);
 }
 
 void TrataCanal2(unsigned int pulso, unsigned char novaLeitura) {
-    unsigned char candidato;
+    unsigned char EstadoFreio;
     unsigned char acelerando;
 
     if (novaLeitura) {
-        candidato = FreioAtivo;
+        EstadoFreio = FreioAtivo;
         if (!FreioAtivo) {
             if ((!FreioInvertido && (pulso > Max2)) ||
-                (FreioInvertido && (pulso < Min2))) candidato = 1;
+                (FreioInvertido && (pulso < Min2))) EstadoFreio = 1;
         } else {
             if ((!FreioInvertido && (pulso < Limite2Soltar)) ||
-                (FreioInvertido && (pulso > Limite2SoltarInv))) candidato = 0;
+                (FreioInvertido && (pulso > Limite2SoltarInv))) EstadoFreio = 0;
         }
-        if (candidato == FreioAtivo) {
+        if (EstadoFreio == FreioAtivo) {
             ContadorFreio = 0;
         } else {
-            if (candidato != CandidatoFreio) {
-                CandidatoFreio = candidato;
+            if (EstadoFreio != TrataRuidoFreio) {
+                TrataRuidoFreio = EstadoFreio;
                 ContadorFreio = 0;
             }
             if (++ContadorFreio == 3) {
-                FreioAtivo = candidato;
+                FreioAtivo = EstadoFreio;
                 ContadorFreio = 0;
             }
         }
