@@ -6,6 +6,7 @@
 #include "TrataCanal3.h"
 #include "TrataCanal1.h"
 #include "TrataCanal2.h"
+#include "TrataLuzRe.h"
 #include "FailSafe.h"
 
 void TrataCanal3_Sinalizar() {
@@ -51,6 +52,7 @@ void main() {
     INTCON.T0IE = 1;
     RC_Inicializar();
     FreioInicializar();
+    LuzRe_Reiniciar();
     FailSafe_Inicializar();
     TrataCanal3_Iniciar(0);
     INTCON.PEIE = 1;
@@ -67,6 +69,7 @@ void main() {
 
         if (perdido) {
             NivelPWMFarois = 0;
+            LuzRe_Reiniciar();
             TrataCanal3_Cancelar(agora);
             ModoProgAnterior = 0;
             FailSafe_Executar(agora);
@@ -81,6 +84,7 @@ void main() {
             TiraMedia_Confirmacao(agora);
             TrataCanal1_Iniciar(agora);
             TrataCanal2_Iniciar();
+            LuzRe_Reiniciar();
             TrataCanal3_Cancelar(agora);
             ModoProgAnterior = 0;
             continue;
@@ -90,6 +94,7 @@ void main() {
             FreioAtivo = 0;
             CandidatoFreio = 0;
             ContadorFreio = 0;
+            LuzRe_Reiniciar();
         }
         ModoProgAnterior = ModoProg;
         if (ModoProg) {
@@ -98,5 +103,6 @@ void main() {
         }
         TrataCanal1(c1, agora, novos & 1);
         TrataCanal2(c2, novos & 2);
+        TrataLuzRe(c2, novos & 2);
     }
 }
