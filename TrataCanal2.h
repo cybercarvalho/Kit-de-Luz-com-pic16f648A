@@ -28,12 +28,12 @@ void TrataCanal2(unsigned int pulso, unsigned char novaLeitura) {
 
     if (novaLeitura) {
         EstadoFreio = FreioAtivo;
+        // Canal 2 HIGH = freio, LOW = aceleracao.
+        // Histerese: aciona em Max2 e solta em Limite2Soltar.
         if (!FreioAtivo) {
-            if ((!FreioInvertido && (pulso > Max2)) ||
-                (FreioInvertido && (pulso < Min2))) EstadoFreio = 1;
+            if (pulso > Max2) EstadoFreio = 1;
         } else {
-            if ((!FreioInvertido && (pulso < Limite2Soltar)) ||
-                (FreioInvertido && (pulso > Limite2SoltarInv))) EstadoFreio = 0;
+            if (pulso < Limite2Soltar) EstadoFreio = 0;
         }
         if (EstadoFreio == FreioAtivo) {
             ContadorFreio = 0;
