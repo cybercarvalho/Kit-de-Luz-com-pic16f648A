@@ -104,5 +104,8 @@ void main() {
         TrataCanal1(c1, agora, novos & 1);
         TrataCanal2(c2, novos & 2);
         TrataLuzRe(c2, novos & 2);
+        // A luz de re define se o PWM de frenagem deve ser pleno.
+        if (EstadoRe != 1 || !FreioAtivo)
+            FreioPWM(Programa == 0 ? 0 : 10);
     }
 }
