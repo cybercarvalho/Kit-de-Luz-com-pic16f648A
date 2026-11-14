@@ -1,6 +1,6 @@
 #ifndef EEPROM_FREIO_H
 #define EEPROM_FREIO_H
-// Acesso direto a EEPROM do PIC16F628A, sem biblioteca EEPROM do mikroC.
+// Acesso direto a EEPROM do PIC16F648A, sem biblioteca EEPROM do mikroC.
 // Endereco 0: 0xA5 = normal; 0x5A = invertido.
 unsigned char LerFreioEEPROM() {
     EEADR = 0;

@@ -1,6 +1,6 @@
 #ifndef CONFIGURACAO_H
 #define CONFIGURACAO_H
-// PIC16F628A, 4 MHz interno. Comparadores desligados.
+// PIC16F648A, 4 MHz interno. Comparadores desligados.
 sbit Canal1 at RB7_bit;
 sbit Canal2 at RB6_bit;
 sbit Canal3 at RB5_bit;
