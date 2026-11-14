@@ -6,7 +6,6 @@
 #include "TrataCanal3.h"
 #include "TrataCanal1.h"
 #include "TrataCanal2.h"
-#include "TrataLuzRe.h"
 #include "FailSafe.h"
 
 void TrataCanal3_Sinalizar() {
@@ -103,14 +102,5 @@ void main() {
         }
         TrataCanal1(c1, agora, novos & 1);
         TrataCanal2(c2, novos & 2);
-        TrataLuzRe(c2, novos & 2);
-
-        // Unico comando de PWM no funcionamento normal:
-        // re ativa -> intensidade base, independentemente do freio.
-        // re apagada + freio ativo -> 100%.
-        if ((EstadoRe != 2) && FreioAtivo)
-            FreioPWM(PWM_ACIONADO);
-        else
-            FreioPWM(Programa == 0 ? 0 : 10);
     }
 }
