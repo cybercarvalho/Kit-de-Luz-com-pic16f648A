@@ -25,7 +25,6 @@ void TrataCanal2_Iniciar() {
 
 void TrataCanal2(unsigned int pulso, unsigned char novaLeitura) {
     unsigned char EstadoFreio;
-    unsigned char acelerando;
 
     if (novaLeitura) {
         EstadoFreio = FreioAtivo;
@@ -49,25 +48,30 @@ void TrataCanal2(unsigned int pulso, unsigned char novaLeitura) {
             }
         }
 
-        // HIGH conta uma nova frenagem; neutro preserva o estado.
-        // LOW e a unica condicao RC que reinicia a sequencia.
-        // A contagem da re e fixa em HIGH, independente da
-        // configuracao de inversao do freio.
+        // LOW (aceleracao) reinicia a sequencia de frenagens.
+        // O neutro nao altera EstadoRe.
         if (pulso < Min2) {
             EstadoRe = 0;
             FreioAnteriorRe = 0;
         } else {
-            acelerando = (pulso > Max2);
-            if (acelerando && !FreioAnteriorRe && EstadoRe < 2)
+            // Conta apenas a transicao para freio confirmado.
+            // O filtro de 3 leituras acima evita contar ruido.
+            if ((pulso > Max2) && FreioAtivo &&
+                !FreioAnteriorRe && (EstadoRe < 2))
                 EstadoRe++;
-            FreioAnteriorRe = acelerando;
+
+            // Memoriza o estado confirmado para detectar
+            // a proxima frenagem depois de voltar ao neutro.
+            FreioAnteriorRe = FreioAtivo;
         }
+
+        // Segunda frenagem liga a re; neutro a mantem ligada.
         Re_Lanterna = (EstadoRe == 2);
     }
 
     // Unico ponto de controle do PWM no modo normal.
     // Re ativa: mantem iluminacao base, mesmo durante frenagem.
-    if ((EstadoRe != 2) && FreioAtivo)
+    if ((EstadoRe == 1) && FreioAtivo)
         FreioPWM(PWM_ACIONADO);
     else
         FreioPWM(Programa == 0 ? 0 : 10);
