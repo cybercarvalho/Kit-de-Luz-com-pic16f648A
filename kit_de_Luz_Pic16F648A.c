@@ -89,7 +89,7 @@ void main() {
             ModoProgAnterior = 0;
             continue;
         }
-        TrataCanal3(c3, c2, agora, novos & 2);
+        TrataCanal3(c3, c2, c1, agora, novos & 2, novos & 1);
         if (ModoProg || ModoProgAnterior) {
             FreioAtivo = 0;
             FiltroRuidoFReio = 0;

@@ -2,7 +2,7 @@
 #define TRATACANAL1_H
 
 // 3 leituras consecutivas para trocar de estado.
-// 5% para acionar; 3% para liberar (histerese).
+// 8% para acionar; 3% para liberar (histerese).
 unsigned int TempoSetas;
 unsigned char FaseSetas;
 unsigned char DirecaoSeta;  // 0=nenhuma, 1=esquerda, 2=direita
@@ -104,8 +104,8 @@ void TrataCanal1(unsigned int pulso, unsigned int agora,
         SetaEsquerda = FaseSetas;
         SetaDireita = FaseSetas;
     } else {
-        SetaEsquerda = FaseSetas && (DirecaoSeta == 1);
-        SetaDireita = FaseSetas && (DirecaoSeta == 2);
+        SetaEsquerda = FaseSetas && (DirecaoSeta == (SetasInvertidas ? 2 : 1));
+        SetaDireita = FaseSetas && (DirecaoSeta == (SetasInvertidas ? 1 : 2));
     }
 }
 #endif
