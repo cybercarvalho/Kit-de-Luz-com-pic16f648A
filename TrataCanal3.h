@@ -7,6 +7,67 @@ unsigned char Programa, ModoProg, Ch3Estado, Ch2Armado, Ch2Altos, Ch1Armado, Ch1
 unsigned char FreioInvertido, SetasInvertidas, BrakeLight, LuzProg, PassoLuz;
 unsigned int TempoCh3, TempoProg;
 
+// Configuracao central dos seis programas.
+// A execucao do strobo, setas e freio permanece nas rotinas dos canais.
+unsigned char Neon, PWMBaseFreio, ModoStrobo, PiscaAlerta;
+unsigned char NivelBaseFarois;
+
+void ConfigurarPrograma() {
+    switch (Programa) {
+        case 0:
+            NivelBaseFarois = 0;
+            PWMBaseFreio = 0;
+            Neon = 0;
+            ModoStrobo = 0;
+            PiscaAlerta = 0;
+            break;
+        case 1:
+            NivelBaseFarois = 1;
+            PWMBaseFreio = 10;
+            Neon = 0;
+            ModoStrobo = 0;
+            PiscaAlerta = 0;
+            break;
+        case 2:
+            NivelBaseFarois = 16;
+            PWMBaseFreio = 10;
+            Neon = 0;
+            ModoStrobo = 0;
+            PiscaAlerta = 0;
+            break;
+        case 3:
+            NivelBaseFarois = 16;
+            PWMBaseFreio = 10;
+            Neon = 1;
+            ModoStrobo = 0;
+            PiscaAlerta = 0;
+            break;
+        case 4:
+            NivelBaseFarois = 0;
+            PWMBaseFreio = 10;
+            Neon = 0;
+            ModoStrobo = 1;
+            PiscaAlerta = 0;
+            break;
+        case 5:
+            NivelBaseFarois = 16;
+            PWMBaseFreio = 10;
+            Neon = 0;
+            ModoStrobo = 0;
+            PiscaAlerta = 1;
+            break;
+        default:
+            Programa = 0;
+            NivelBaseFarois = 0;
+            PWMBaseFreio = 0;
+            Neon = 0;
+            ModoStrobo = 0;
+            PiscaAlerta = 0;
+            break;
+    }
+}
+
+
 void TrataCanal3_Iniciar(unsigned int agora) {
     Programa = 0;
     ModoProg = 0;
