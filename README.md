@@ -2,7 +2,7 @@
 
 Base: firmware PIC16F628A (commit 6a6741de8b88baf4013507fae38e61bd676b6876).
 
-Arquivo principal: `kit_de_Luz_16f648A_2026.c`.
+Arquivo principal: `kit_de_Luz_Pic16F648A.c`.
 
 Para testar no mikroC PRO for PIC: selecionar dispositivo PIC16F648A e clock de 4 MHz. Configurar oscilador interno 4 MHz, MCLR desabilitado, watchdog desabilitado e LVP desabilitado. Compilar e conferir ROM/RAM antes de gravar.
 
