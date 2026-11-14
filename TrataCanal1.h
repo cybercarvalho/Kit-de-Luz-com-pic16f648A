@@ -24,7 +24,7 @@ void FaroisPWM_Interrupcao() {
 }
 
 void TrataCanal1_Programa() {
-    if (Programa != 3)
+    if (Programa != 4)
         NivelPWMFarois = (Programa == 0) ? 0 :
                          (Programa == 1) ? 1 : 16;
 }
@@ -51,7 +51,7 @@ void TrataCanal1(unsigned int pulso, unsigned int agora,
 
     // Strobo 1: 10 piscadas de 25 ms ON / 25 ms OFF;
     // depois 150 ms apagado. Relogio de 8 bits (modulo 256).
-    if (Programa == 3) {
+    if (Programa == 4) {
         if ((unsigned char)((unsigned char)agora - TempoStrobo) >=
             (PassoStrobo == 20 ? 150 : 25)) {
             TempoStrobo = (unsigned char)agora;
@@ -65,7 +65,7 @@ void TrataCanal1(unsigned int pulso, unsigned int agora,
     }
 
     // Avaliar apenas uma vez por pulso RC recebido, nunca por giro do while.
-    if (novaLeitura && Programa != 4) {
+    if (novaLeitura && Programa != 5) {
         candidato = DirecaoSeta;
 
         if (DirecaoSeta == 1) {
@@ -100,7 +100,7 @@ void TrataCanal1(unsigned int pulso, unsigned int agora,
         TempoSetas = agora;
         FaseSetas = !FaseSetas;
     }
-    if (Programa == 4) {
+    if (Programa == 5) {
         SetaEsquerda = FaseSetas;
         SetaDireita = FaseSetas;
     } else {

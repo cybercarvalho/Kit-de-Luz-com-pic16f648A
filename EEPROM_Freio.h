@@ -41,4 +41,24 @@ void SalvarSetasEEPROM(unsigned char invertidas) {
     while (EECON1.WR) { }
     EECON1.WREN = 0;
 }
+// Endereco 2: 0x5A = Brake Light habilitado; demais valores = desligado.
+unsigned char LerBrakeLightEEPROM() {
+    EEADR = 2;
+    EECON1.RD = 1;
+    return EEDATA;
+}
+void SalvarBrakeLightEEPROM(unsigned char habilitado) {
+    unsigned char gieAnterior;
+    EEADR = 2;
+    EEDATA = habilitado ? 0x5A : 0xA5;
+    EECON1.WREN = 1;
+    gieAnterior = INTCON.GIE;
+    INTCON.GIE = 0;
+    EECON2 = 0x55;
+    EECON2 = 0xAA;
+    EECON1.WR = 1;
+    INTCON.GIE = gieAnterior;
+    while (EECON1.WR) { }
+    EECON1.WREN = 0;
+}
 #endif

@@ -9,6 +9,16 @@
 #include "TrataLuzRe.h"
 #include "FailSafe.h"
 
+// Ajuste a tabela de programas conforme desejado: 1 = neon aceso.
+unsigned char Neon;
+void AtualizarNeon() {
+    Neon = (Programa == 3) ? 1 : 0;
+    if (BrakeLight)
+        Neon_BrakeLight = (CCPR1L == PWM_ACIONADO);
+    else
+        Neon_BrakeLight = Neon;
+}
+
 void TrataCanal3_Sinalizar() {
     unsigned char setas, farois;
     setas = LuzProg & 1;
@@ -69,6 +79,7 @@ void main() {
 
         if (perdido) {
             NivelPWMFarois = 0;
+            Neon_BrakeLight = 0;
             LuzRe_Reiniciar();
             TrataCanal3_Cancelar(agora);
             ModoProgAnterior = 0;
@@ -107,5 +118,6 @@ void main() {
         // A luz de re define se o PWM de frenagem deve ser pleno.
         if (EstadoRe != 1 || !FreioAtivo)
             FreioPWM(Programa == 0 ? 0 : 10);
+        AtualizarNeon();
     }
 }

@@ -3,8 +3,8 @@
 // ModoProg: 0=normal, 1=sequencia inicial, 2=apagado 2s,
 // 3=pisca 100ms, 4=apagado apos confirmar inversao.
 // LuzProg: 0=apagado, 1=setas, 2=farois+freio, 3=todas.
-unsigned char Programa, ModoProg, Ch3Estado, Ch2Armado, Ch2Altos, Ch1Armado, Ch1Altos;
-unsigned char FreioInvertido, SetasInvertidas, LuzProg, PassoLuz;
+unsigned char Programa, ModoProg, Ch3Estado, Ch2Armado, Ch2Altos, Ch1Armado, Ch1Altos, Ch2BaixoArmado, Ch2Baixos;
+unsigned char FreioInvertido, SetasInvertidas, BrakeLight, LuzProg, PassoLuz;
 unsigned int TempoCh3, TempoProg;
 
 void TrataCanal3_Iniciar(unsigned int agora) {
@@ -15,12 +15,15 @@ void TrataCanal3_Iniciar(unsigned int agora) {
         Ch1Armado = 0;
         Ch1Altos = 0;
     Ch2Altos = 0;
+    Ch2BaixoArmado = 0;
+    Ch2Baixos = 0;
     LuzProg = 0;
     PassoLuz = 0;
     TempoCh3 = agora;
     TempoProg = agora;
     FreioInvertido = (LerFreioEEPROM() == 0x5A);
     SetasInvertidas = (LerSetasEEPROM() == 0x5A);
+    BrakeLight = (LerBrakeLightEEPROM() == 0x5A);
 }
 void TrataCanal3_Cancelar(unsigned int agora) {
     ModoProg = 0;
@@ -29,6 +32,8 @@ void TrataCanal3_Cancelar(unsigned int agora) {
         Ch1Armado = 0;
         Ch1Altos = 0;
     Ch2Altos = 0;
+    Ch2BaixoArmado = 0;
+    Ch2Baixos = 0;
     LuzProg = 0;
     PassoLuz = 0;
     TempoCh3 = agora;
@@ -41,7 +46,7 @@ void TrataCanal3(unsigned int c3, unsigned int c2, unsigned int c1,
         // Pulso curto baixo-alto-baixo troca programa.
         if ((Ch3Estado == 2) && (ModoProg == 1)) {
             Programa++;
-            if (Programa == 5) Programa = 0;
+            if (Programa == 6) Programa = 0;
         }
         Ch3Estado = 1;
         ModoProg = 0;
@@ -49,6 +54,8 @@ void TrataCanal3(unsigned int c3, unsigned int c2, unsigned int c1,
         Ch1Armado = 0;
         Ch1Altos = 0;
     Ch2Altos = 0;
+    Ch2BaixoArmado = 0;
+    Ch2Baixos = 0;
         LuzProg = 0;
         PassoLuz = 0;
         return;
@@ -71,6 +78,8 @@ void TrataCanal3(unsigned int c3, unsigned int c2, unsigned int c1,
         Ch1Armado = 0;
         Ch1Altos = 0;
             Ch2Altos = 0;
+    Ch2BaixoArmado = 0;
+    Ch2Baixos = 0;
             return;
         }
         // 0-50ms: setas; 50-100ms: farois e freio;
@@ -95,6 +104,8 @@ void TrataCanal3(unsigned int c3, unsigned int c2, unsigned int c1,
         Ch1Armado = 0;
         Ch1Altos = 0;
             Ch2Altos = 0;
+    Ch2BaixoArmado = 0;
+    Ch2Baixos = 0;
         }
         return;
     }
@@ -104,59 +115,51 @@ void TrataCanal3(unsigned int c3, unsigned int c2, unsigned int c1,
         LuzProg = 0;
         return;
     }
-    // Comando somente quando o kit esta aguardando programacao.
-    // Exige Canal 2 baixo antes de uma nova transicao para alto.
+    // Programacao: Canal 2 +8% inverte freio, -8% alterna Brake Light.
+    // Ambos exigem passagem pelo neutro e tres leituras consecutivas.
     if (novo2) {
-        // Limiar exclusivo da programacao: 10% acima da media.
-        // O freio normal continua utilizando Max2 (8%).
-        if (c2 <= Max2) {
-            Ch2Armado = 1;
-            Ch2Altos = 0;
-        }
-        else if (c2 > Limite2Prog) {
-            if (Ch2Armado) {
-                Ch2Altos++;
-                if (Ch2Altos >= 3) {
-                    Ch2Armado = 0;
-        Ch1Armado = 0;
-        Ch1Altos = 0;
-                    Ch2Altos = 0;
-                    FreioInvertido = !FreioInvertido;
-                    SalvarFreioEEPROM(FreioInvertido);
-                    ModoProg = 4;
-                    LuzProg = 0;
-                    return;
-                }
+        if (c2 > Limite2Prog) {
+            Ch2Baixos = 0;
+            if (Ch2Armado && ++Ch2Altos >= 3) {
+                Ch2Armado = 0;
+                Ch2Altos = 0;
+                FreioInvertido = !FreioInvertido;
+                SalvarFreioEEPROM(FreioInvertido);
+                ModoProg = 4;
+                LuzProg = 0;
+                return;
             }
-        }
-        else {
-            // Zona intermediaria: nao confirma HIGH.
+        } else if (c2 < Limite2ProgBaixo) {
             Ch2Altos = 0;
+            if (Ch2BaixoArmado && ++Ch2Baixos >= 3) {
+                Ch2BaixoArmado = 0;
+                Ch2Baixos = 0;
+                BrakeLight = !BrakeLight;
+                SalvarBrakeLightEEPROM(BrakeLight);
+                ModoProg = 4;
+                LuzProg = 0;
+                return;
+            }
+        } else {
+            Ch2Armado = 1;
+            Ch2BaixoArmado = 1;
+            Ch2Altos = 0;
+            Ch2Baixos = 0;
         }
     }
-    // Canal 1: mesmo procedimento do Canal 2, mas para inverter as setas.
-    // Requer uma leitura em neutro/baixo para armar e 3 pulsos acima de +10%.
+    // Canal 1 +8%: inverte as setas.
     if (novo1) {
-        if (c1 <= Max1) {
+        if (c1 <= Limite1Prog) {
             Ch1Armado = 1;
             Ch1Altos = 0;
-        }
-        else if (c1 > Limite1Prog) {
-            if (Ch1Armado) {
-                Ch1Altos++;
-                if (Ch1Altos >= 3) {
-                    Ch1Armado = 0;
-                    Ch1Altos = 0;
-                    SetasInvertidas = !SetasInvertidas;
-                    SalvarSetasEEPROM(SetasInvertidas);
-                    ModoProg = 4;
-                    LuzProg = 0;
-                    return;
-                }
-            }
-        }
-        else {
+        } else if (Ch1Armado && ++Ch1Altos >= 3) {
+            Ch1Armado = 0;
             Ch1Altos = 0;
+            SetasInvertidas = !SetasInvertidas;
+            SalvarSetasEEPROM(SetasInvertidas);
+            ModoProg = 4;
+            LuzProg = 0;
+            return;
         }
     }
     intervalo = 100;
