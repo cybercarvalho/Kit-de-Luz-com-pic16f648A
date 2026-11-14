@@ -35,7 +35,7 @@ void TrataCanal2(unsigned int pulso, unsigned char novaLeitura) {
             }
         }
     }
-    if (FreioAtivo) FreioPWM(PWM_ACIONADO);
-    else FreioPWM(Programa == 0 ? 0 : 10);
+    // O PWM do freio e aplicado no main, apos TrataLuzRe.
+    // Assim nao ha pulso de frenagem durante a luz de re.
 }
 #endif
