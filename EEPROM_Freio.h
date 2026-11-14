@@ -21,4 +21,24 @@ void SalvarFreioEEPROM(unsigned char invertido) {
     while (EECON1.WR) { }
     EECON1.WREN = 0;
 }
+// Endereco 1: 0xA5 = setas normais; 0x5A = setas invertidas.
+unsigned char LerSetasEEPROM() {
+    EEADR = 1;
+    EECON1.RD = 1;
+    return EEDATA;
+}
+void SalvarSetasEEPROM(unsigned char invertidas) {
+    unsigned char gieAnterior;
+    EEADR = 1;
+    EEDATA = invertidas ? 0x5A : 0xA5;
+    EECON1.WREN = 1;
+    gieAnterior = INTCON.GIE;
+    INTCON.GIE = 0;
+    EECON2 = 0x55;
+    EECON2 = 0xAA;
+    EECON1.WR = 1;
+    INTCON.GIE = gieAnterior;
+    while (EECON1.WR) { }
+    EECON1.WREN = 0;
+}
 #endif
