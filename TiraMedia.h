@@ -10,7 +10,7 @@ unsigned char EstadoSistema;
 unsigned char Amostras1, Amostras2;
 unsigned int Soma1, Soma2;
 unsigned int Media1, Media2;
-unsigned int Min1, Max1, Min2, Max2, Margem1Soltar, Limite2Soltar, Limite2SoltarInv, Limite2Prog;
+unsigned int Min1, Max1, Min2, Max2, Margem1Soltar, Limite2Soltar, Limite2SoltarInv, Limite2Prog, Limite1Prog;
 
 void TiraMedia_Iniciar() {
     Amostras1 = 0; Amostras2 = 0;
@@ -41,6 +41,7 @@ void TiraMedia_Atualizar(unsigned char novos,
         Max2 = Media2 + margem;
         Min2 = Media2 - margem;
         Limite2Prog = Media2 + (Media2 / 10);
+        Limite1Prog = Media1 + (Media1 / 10);
         Margem1Soltar = Media1 / 33;
         margem = Media2 / 33;
         Limite2SoltarInv = Media2 - margem;
