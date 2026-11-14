@@ -3,8 +3,8 @@
 // ModoProg: 0=normal, 1=sequencia inicial, 2=apagado 2s,
 // 3=pisca 100ms, 4=apagado apos confirmar inversao.
 // LuzProg: 0=apagado, 1=setas, 2=farois+freio, 3=todas.
-unsigned char Programa, ModoProg, Ch3Estado, Ch2Armado, Ch2Altos;
-unsigned char FreioInvertido, LuzProg, PassoLuz;
+unsigned char Programa, ModoProg, Ch3Estado, Ch2Armado, Ch2Altos, Ch1Armado, Ch1Altos;
+unsigned char FreioInvertido, SetasInvertidas, LuzProg, PassoLuz;
 unsigned int TempoCh3, TempoProg;
 
 void TrataCanal3_Iniciar(unsigned int agora) {
@@ -12,24 +12,30 @@ void TrataCanal3_Iniciar(unsigned int agora) {
     ModoProg = 0;
     Ch3Estado = 0;
     Ch2Armado = 0;
+    Ch1Armado = 0;
+    Ch1Altos = 0;
     Ch2Altos = 0;
     LuzProg = 0;
     PassoLuz = 0;
     TempoCh3 = agora;
     TempoProg = agora;
     FreioInvertido = (LerFreioEEPROM() == 0x5A);
+    SetasInvertidas = (LerSetasEEPROM() == 0x5A);
 }
 void TrataCanal3_Cancelar(unsigned int agora) {
     ModoProg = 0;
     Ch3Estado = 0;
     Ch2Armado = 0;
+    Ch1Armado = 0;
+    Ch1Altos = 0;
     Ch2Altos = 0;
     LuzProg = 0;
     PassoLuz = 0;
     TempoCh3 = agora;
 }
-void TrataCanal3(unsigned int c3, unsigned int c2,
-                 unsigned int agora, unsigned char novo2) {
+void TrataCanal3(unsigned int c3, unsigned int c2, unsigned int c1,
+                 unsigned int agora, unsigned char novo2,
+                 unsigned char novo1) {
     unsigned int intervalo;
     if (c3 <= 1500) {
         // Pulso curto baixo-alto-baixo troca programa.
@@ -40,6 +46,8 @@ void TrataCanal3(unsigned int c3, unsigned int c2,
         Ch3Estado = 1;
         ModoProg = 0;
         Ch2Armado = 0;
+    Ch1Armado = 0;
+    Ch1Altos = 0;
     Ch2Altos = 0;
         LuzProg = 0;
         PassoLuz = 0;
@@ -60,6 +68,8 @@ void TrataCanal3(unsigned int c3, unsigned int c2,
             TempoProg = agora;
             LuzProg = 0;
             Ch2Armado = 0;
+    Ch1Armado = 0;
+    Ch1Altos = 0;
             Ch2Altos = 0;
             return;
         }
@@ -82,6 +92,8 @@ void TrataCanal3(unsigned int c3, unsigned int c2,
             TempoProg = agora;
             LuzProg = 3;
             Ch2Armado = 0;
+    Ch1Armado = 0;
+    Ch1Altos = 0;
             Ch2Altos = 0;
         }
         return;
@@ -106,6 +118,8 @@ void TrataCanal3(unsigned int c3, unsigned int c2,
                 Ch2Altos++;
                 if (Ch2Altos >= 3) {
                     Ch2Armado = 0;
+    Ch1Armado = 0;
+    Ch1Altos = 0;
                     Ch2Altos = 0;
                     FreioInvertido = !FreioInvertido;
                     SalvarFreioEEPROM(FreioInvertido);
@@ -118,6 +132,31 @@ void TrataCanal3(unsigned int c3, unsigned int c2,
         else {
             // Zona intermediaria: nao confirma HIGH.
             Ch2Altos = 0;
+        }
+    }
+    // Canal 1: mesmo procedimento do Canal 2, mas para inverter as setas.
+    // Requer uma leitura em neutro/baixo para armar e 3 pulsos acima de +10%.
+    if (novo1) {
+        if (c1 <= Max1) {
+            Ch1Armado = 1;
+            Ch1Altos = 0;
+        }
+        else if (c1 > Limite1Prog) {
+            if (Ch1Armado) {
+                Ch1Altos++;
+                if (Ch1Altos >= 3) {
+                    Ch1Armado = 0;
+                    Ch1Altos = 0;
+                    SetasInvertidas = !SetasInvertidas;
+                    SalvarSetasEEPROM(SetasInvertidas);
+                    ModoProg = 4;
+                    LuzProg = 0;
+                    return;
+                }
+            }
+        }
+        else {
+            Ch1Altos = 0;
         }
     }
     intervalo = 100;
