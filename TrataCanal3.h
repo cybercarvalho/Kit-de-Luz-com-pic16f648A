@@ -115,87 +115,51 @@ void TrataCanal3(unsigned int c3, unsigned int c2, unsigned int c1,
         LuzProg = 0;
         return;
     }
-    // Comando somente quando o kit esta aguardando programacao.
-    // Exige Canal 2 baixo antes de uma nova transicao para alto.
+    // Programacao: Canal 2 +8% inverte freio, -8% alterna Brake Light.
+    // Ambos exigem passagem pelo neutro e tres leituras consecutivas.
     if (novo2) {
-        // Limiar exclusivo da programacao: 10% acima da media.
-        // O freio normal continua utilizando Max2 (8%).
-        if (c2 <= Max2) {
-            Ch2Armado = 1;
-            Ch2Altos = 0;
-    Ch2BaixoArmado = 0;
-    Ch2Baixos = 0;
-        }
-        else if (c2 > Limite2Prog) {
-            if (Ch2Armado) {
-                Ch2Altos++;
-                if (Ch2Altos >= 3) {
-                    Ch2Armado = 0;
-        Ch1Armado = 0;
-        Ch1Altos = 0;
-                    Ch2Altos = 0;
-    Ch2BaixoArmado = 0;
-    Ch2Baixos = 0;
-                    FreioInvertido = !FreioInvertido;
-                    SalvarFreioEEPROM(FreioInvertido);
-                    ModoProg = 4;
-                    LuzProg = 0;
-                    return;
-                }
-            }
-        }
-        else {
-            // Zona intermediaria: nao confirma HIGH.
-            Ch2Altos = 0;
-    Ch2BaixoArmado = 0;
-    Ch2Baixos = 0;
-        }
-    }
-    // Canal 2 abaixo de -10%: alterna a funcao Brake Light da RA2.
-    // Armado no neutro; exige tres pulsos RC consecutivos no lado baixo.
-    if (novo2) {
-        if (c2 >= Min2 && c2 <= Max2) {
-            Ch2BaixoArmado = 1;
+        if (c2 > Limite2Prog) {
             Ch2Baixos = 0;
+            if (Ch2Armado && ++Ch2Altos >= 3) {
+                Ch2Armado = 0;
+                Ch2Altos = 0;
+                FreioInvertido = !FreioInvertido;
+                SalvarFreioEEPROM(FreioInvertido);
+                ModoProg = 4;
+                LuzProg = 0;
+                return;
+            }
         } else if (c2 < Limite2ProgBaixo) {
-            if (Ch2BaixoArmado) {
-                if (++Ch2Baixos >= 3) {
-                    Ch2BaixoArmado = 0;
-                    Ch2Baixos = 0;
-                    BrakeLight = !BrakeLight;
-                    SalvarBrakeLightEEPROM(BrakeLight);
-                    ModoProg = 4;
-                    LuzProg = 0;
-                    return;
-                }
+            Ch2Altos = 0;
+            if (Ch2BaixoArmado && ++Ch2Baixos >= 3) {
+                Ch2BaixoArmado = 0;
+                Ch2Baixos = 0;
+                BrakeLight = !BrakeLight;
+                SalvarBrakeLightEEPROM(BrakeLight);
+                ModoProg = 4;
+                LuzProg = 0;
+                return;
             }
         } else {
+            Ch2Armado = 1;
+            Ch2BaixoArmado = 1;
+            Ch2Altos = 0;
             Ch2Baixos = 0;
         }
     }
-    // Canal 1: mesmo procedimento do Canal 2, mas para inverter as setas.
-    // Requer uma leitura em neutro/baixo para armar e 3 pulsos acima de +10%.
+    // Canal 1 +8%: inverte as setas.
     if (novo1) {
-        if (c1 <= Max1) {
+        if (c1 <= Limite1Prog) {
             Ch1Armado = 1;
             Ch1Altos = 0;
-        }
-        else if (c1 > Limite1Prog) {
-            if (Ch1Armado) {
-                Ch1Altos++;
-                if (Ch1Altos >= 3) {
-                    Ch1Armado = 0;
-                    Ch1Altos = 0;
-                    SetasInvertidas = !SetasInvertidas;
-                    SalvarSetasEEPROM(SetasInvertidas);
-                    ModoProg = 4;
-                    LuzProg = 0;
-                    return;
-                }
-            }
-        }
-        else {
+        } else if (Ch1Armado && ++Ch1Altos >= 3) {
+            Ch1Armado = 0;
             Ch1Altos = 0;
+            SetasInvertidas = !SetasInvertidas;
+            SalvarSetasEEPROM(SetasInvertidas);
+            ModoProg = 4;
+            LuzProg = 0;
+            return;
         }
     }
     intervalo = 100;
