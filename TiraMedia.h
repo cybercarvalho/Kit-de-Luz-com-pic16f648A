@@ -40,9 +40,9 @@ void TiraMedia_Atualizar(unsigned char novos,
         margem = (Media2 * 2) / 25;
         Max2 = Media2 + margem;
         Min2 = Media2 - margem;
-        Limite2Prog = Media2 + (Media2 / 10);
-        Limite2ProgBaixo = Media2 - (Media2 / 10);
-        Limite1Prog = Media1 + (Media1 / 10);
+        Limite2Prog = Media2 + ((Media2 * 2) / 25);
+        Limite2ProgBaixo = Media2 - ((Media2 * 2) / 25);
+        Limite1Prog = Media1 + ((Media1 * 2) / 25);
         Margem1Soltar = Media1 / 33;
         margem = Media2 / 33;
         Limite2SoltarInv = Media2 - margem;
