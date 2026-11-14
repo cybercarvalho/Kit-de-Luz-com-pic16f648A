@@ -12,8 +12,8 @@ void TrataCanal3_Iniciar(unsigned int agora) {
     ModoProg = 0;
     Ch3Estado = 0;
     Ch2Armado = 0;
-    Ch1Armado = 0;
-    Ch1Altos = 0;
+        Ch1Armado = 0;
+        Ch1Altos = 0;
     Ch2Altos = 0;
     LuzProg = 0;
     PassoLuz = 0;
@@ -26,8 +26,8 @@ void TrataCanal3_Cancelar(unsigned int agora) {
     ModoProg = 0;
     Ch3Estado = 0;
     Ch2Armado = 0;
-    Ch1Armado = 0;
-    Ch1Altos = 0;
+        Ch1Armado = 0;
+        Ch1Altos = 0;
     Ch2Altos = 0;
     LuzProg = 0;
     PassoLuz = 0;
@@ -46,8 +46,8 @@ void TrataCanal3(unsigned int c3, unsigned int c2, unsigned int c1,
         Ch3Estado = 1;
         ModoProg = 0;
         Ch2Armado = 0;
-    Ch1Armado = 0;
-    Ch1Altos = 0;
+        Ch1Armado = 0;
+        Ch1Altos = 0;
     Ch2Altos = 0;
         LuzProg = 0;
         PassoLuz = 0;
@@ -68,8 +68,8 @@ void TrataCanal3(unsigned int c3, unsigned int c2, unsigned int c1,
             TempoProg = agora;
             LuzProg = 0;
             Ch2Armado = 0;
-    Ch1Armado = 0;
-    Ch1Altos = 0;
+        Ch1Armado = 0;
+        Ch1Altos = 0;
             Ch2Altos = 0;
             return;
         }
@@ -92,8 +92,8 @@ void TrataCanal3(unsigned int c3, unsigned int c2, unsigned int c1,
             TempoProg = agora;
             LuzProg = 3;
             Ch2Armado = 0;
-    Ch1Armado = 0;
-    Ch1Altos = 0;
+        Ch1Armado = 0;
+        Ch1Altos = 0;
             Ch2Altos = 0;
         }
         return;
@@ -108,7 +108,7 @@ void TrataCanal3(unsigned int c3, unsigned int c2, unsigned int c1,
     // Exige Canal 2 baixo antes de uma nova transicao para alto.
     if (novo2) {
         // Limiar exclusivo da programacao: 10% acima da media.
-        // O freio normal continua utilizando Max2 (5%).
+        // O freio normal continua utilizando Max2 (8%).
         if (c2 <= Max2) {
             Ch2Armado = 1;
             Ch2Altos = 0;
@@ -118,8 +118,8 @@ void TrataCanal3(unsigned int c3, unsigned int c2, unsigned int c1,
                 Ch2Altos++;
                 if (Ch2Altos >= 3) {
                     Ch2Armado = 0;
-    Ch1Armado = 0;
-    Ch1Altos = 0;
+        Ch1Armado = 0;
+        Ch1Altos = 0;
                     Ch2Altos = 0;
                     FreioInvertido = !FreioInvertido;
                     SalvarFreioEEPROM(FreioInvertido);
