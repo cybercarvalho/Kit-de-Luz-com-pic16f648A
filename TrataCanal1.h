@@ -24,7 +24,7 @@ void FaroisPWM_Interrupcao() {
 }
 
 void TrataCanal1_Programa() {
-    if (Programa != 5)
+    if (Programa != 4)
         NivelPWMFarois = (Programa == 0) ? 0 :
                          (Programa == 1) ? 1 : 16;
 }
