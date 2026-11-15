@@ -6,6 +6,7 @@
 #include "TrataCanal3.h"
 #include "TrataCanal1.h"
 #include "TrataCanal2.h"
+#include "TrataFarolAlto.h"
 #include "TrataLuzRe.h"
 #include "FailSafe.h"
 
@@ -61,6 +62,7 @@ void main() {
     RC_Inicializar();
     FreioInicializar();
     LuzRe_Reiniciar();
+    TrataFarolAlto_Reiniciar();
     FailSafe_Inicializar();
     TrataCanal3_Iniciar(0);
     INTCON.PEIE = 1;
@@ -80,6 +82,7 @@ void main() {
             NivelPWMFarolEsquerdo = 0;
             Neon_BrakeLight = 0;
             LuzRe_Reiniciar();
+            TrataFarolAlto_Reiniciar();
             TrataCanal3_Cancelar(agora);
             ModoProgAnterior = 0;
             FailSafe_Executar(agora);
@@ -95,6 +98,7 @@ void main() {
             TrataCanal1_Iniciar(agora);
             TrataCanal2_Iniciar();
             LuzRe_Reiniciar();
+            TrataFarolAlto_Reiniciar();
             TrataCanal3_Cancelar(agora);
             ModoProgAnterior = 0;
             continue;
@@ -105,6 +109,7 @@ void main() {
             FiltroRuidoFReio = 0;
             ContadorFreio = 0;
             LuzRe_Reiniciar();
+            TrataFarolAlto_Reiniciar();
         }
         ModoProgAnterior = ModoProg;
         if (ModoProg) {
@@ -113,6 +118,7 @@ void main() {
         }
         ConfigurarPrograma();
         TrataCanal1(c1, agora, novos & 1);
+        TrataFarolAlto(c2, novos & 2);
         TrataCanal2(c2, novos & 2);
         TrataLuzRe(c2, novos & 2);
         // A luz de re define se o PWM de frenagem deve ser pleno.
