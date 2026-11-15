@@ -121,8 +121,11 @@ void main() {
         TrataFarolAlto(c2, novos & 2);
         TrataCanal2(c2, novos & 2);
         TrataLuzRe(c2, novos & 2);
-        // A luz de re define se o PWM de frenagem deve ser pleno.
-        if (EstadoRe != 1 || !FreioAtivo)
+        // Atualizar PWM somente depois de decidir o estado da re.
+        // Na segunda frenagem, EstadoRe ja sera 2: sem pulso de freio.
+        if (FreioAtivo && EstadoRe == 1)
+            FreioPWM(PWM_ACIONADO);
+        else
             FreioPWM(PWMBaseFreio);
         AtualizarNeon();
     }
