@@ -1,7 +1,6 @@
 #ifndef TRATAFAROLALTO_H
 #define TRATAFAROLALTO_H
 // Flag: 1 habilita farol alto ao acelerar, 0 desabilita.
-unsigned char FarolAltoAceleracao = 0;
 unsigned char AceleracaoAtiva = 0;
 unsigned char CandidatoAceleracao = 0;
 unsigned char ContadorAceleracao = 0;
