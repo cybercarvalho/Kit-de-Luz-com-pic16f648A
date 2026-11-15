@@ -11,6 +11,7 @@ unsigned int TempoCh3, TempoProg;
 // A execucao do strobo, setas e freio permanece nas rotinas dos canais.
 unsigned char Neon, PWMBaseFreio, ModoStrobo, PiscaAlerta;
 unsigned char NivelBaseFarois;
+unsigned char FarolAltoAceleracao = 0;
 
 void ConfigurarPrograma() {
     FarolAltoAceleracao = (Programa == 3);
