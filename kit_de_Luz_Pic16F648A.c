@@ -21,6 +21,7 @@ void TrataCanal3_Sinalizar() {
     setas = LuzProg & 1;
     farois = (LuzProg >> 1) & 1;
     NivelPWMFarois = farois ? 16 : 0;
+    NivelPWMFarolEsquerdo = NivelPWMFarois;
     SetaEsquerda = setas;
     SetaDireita = setas;
     Neon_BrakeLight = farois;
@@ -76,6 +77,7 @@ void main() {
 
         if (perdido) {
             NivelPWMFarois = 0;
+            NivelPWMFarolEsquerdo = 0;
             Neon_BrakeLight = 0;
             LuzRe_Reiniciar();
             TrataCanal3_Cancelar(agora);
