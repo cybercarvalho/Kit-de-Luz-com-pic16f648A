@@ -53,9 +53,8 @@ void ConfigurarPrograma() {
             NivelBaseFarois = 0;
             PWMBaseFreio = 10;
             Neon = 0;
-            ModoStrobo = 0;
-            PiscaAlerta = 0;
             ModoStrobo = 2;
+            PiscaAlerta = 0;
             break;
         case 6:
             NivelBaseFarois = 0;
