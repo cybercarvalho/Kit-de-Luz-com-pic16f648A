@@ -13,6 +13,7 @@ unsigned char Neon, PWMBaseFreio, ModoStrobo, PiscaAlerta;
 unsigned char NivelBaseFarois;
 
 void ConfigurarPrograma() {
+    FarolAltoAceleracao = (Programa == 3);
     switch (Programa) {
         case 0:
             NivelBaseFarois = 0;
