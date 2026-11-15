@@ -37,7 +37,6 @@ void TrataCanal2(unsigned int pulso, unsigned char novaLeitura) {
             }
         }
     }
-    if (FreioAtivo && (EstadoRe == 1)) FreioPWM(PWM_ACIONADO);
-    else FreioPWM(PWMBaseFreio);
+    // PWM do freio e atualizado somente apos TrataLuzRe decidir EstadoRe.
 }
 #endif
