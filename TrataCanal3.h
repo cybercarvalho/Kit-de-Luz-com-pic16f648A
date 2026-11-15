@@ -7,7 +7,7 @@ unsigned char Programa, ModoProg, Ch3Estado, Ch2Armado, Ch2Altos, Ch1Armado, Ch1
 unsigned char FreioInvertido, SetasInvertidas, BrakeLight, LuzProg, PassoLuz;
 unsigned int TempoCh3, TempoProg;
 
-// Configuracao central dos seis programas.
+// Configuracao central dos nove programas.
 // A execucao do strobo, setas e freio permanece nas rotinas dos canais.
 unsigned char Neon, PWMBaseFreio, ModoStrobo, PiscaAlerta;
 unsigned char NivelBaseFarois;
@@ -50,6 +50,28 @@ void ConfigurarPrograma() {
             PiscaAlerta = 0;
             break;
         case 5:
+            NivelBaseFarois = 0;
+            PWMBaseFreio = 10;
+            Neon = 0;
+            ModoStrobo = 0;
+            PiscaAlerta = 0;
+            ModoStrobo = 2;
+            break;
+        case 6:
+            NivelBaseFarois = 0;
+            PWMBaseFreio = 10;
+            Neon = 0;
+            ModoStrobo = 3;
+            PiscaAlerta = 0;
+            break;
+        case 7:
+            NivelBaseFarois = 0;
+            PWMBaseFreio = 10;
+            Neon = 0;
+            ModoStrobo = 4;
+            PiscaAlerta = 0;
+            break;
+        case 8:
             NivelBaseFarois = 16;
             PWMBaseFreio = 10;
             Neon = 0;
@@ -107,7 +129,7 @@ void TrataCanal3(unsigned int c3, unsigned int c2, unsigned int c1,
         // Pulso curto baixo-alto-baixo troca programa.
         if ((Ch3Estado == 2) && (ModoProg == 1)) {
             Programa++;
-            if (Programa == 6) Programa = 0;
+            if (Programa == 9) Programa = 0;
         }
         Ch3Estado = 1;
         ModoProg = 0;
